@@ -4,7 +4,7 @@ public enum ErrorType {
     USER, ITEM;
 
     public static String useType(ErrorType type) {
-        if(type == USER)
+        if (type == USER)
             return NotFoundException.errorUserMessage;
         else
             return NotFoundException.errorItemMessage;
