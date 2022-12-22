@@ -39,12 +39,9 @@ public class InMemoryItemStorage implements ItemStorage {
         if (ownerId != itemToUpd.getOwnerId())
             throw new NotFoundException("Вещь с указанным id у данного собственника не найдена.");
 
-        if (name != null)
-            itemToUpd.setName(name);
-        if (description != null)
-            itemToUpd.setDescription(description);
-        if (available != null)
-            itemToUpd.setAvailable(available);
+        if (name != null) itemToUpd.setName(name);
+        if (description != null) itemToUpd.setDescription(description);
+        if (available != null) itemToUpd.setAvailable(available);
         itemsInMemory.put(itemId, itemToUpd);
         return itemsInMemory.get(itemId);
     }
@@ -59,9 +56,10 @@ public class InMemoryItemStorage implements ItemStorage {
     public List<Item> getAllItemsByUserId(Long ownerId) {
         InMemoryUserStorage.checkUserById(ownerId);
         List<Item> itemsOfUser = new ArrayList<>();
-        for (Item item : itemsInMemory.values())
-            if (item.getOwnerId() == ownerId)
-                itemsOfUser.add(item);
+        for (Item item : itemsInMemory.values()) {
+            long ownerForComparison = item.getOwnerId();
+            if (ownerForComparison == ownerId) itemsOfUser.add(item);
+        }
         return itemsOfUser;
     }
 
@@ -74,8 +72,7 @@ public class InMemoryItemStorage implements ItemStorage {
                 String description = item.getDescription();
                 Boolean available = item.getAvailable();
 
-                if (available && (name.toLowerCase().contains(text.toLowerCase()) ||
-                        description.toLowerCase().contains(text.toLowerCase())))
+                if (available && (name.toLowerCase().contains(text.toLowerCase()) || description.toLowerCase().contains(text.toLowerCase())))
                     items.add(item);
             }
         }
@@ -83,7 +80,6 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     private void checkItemById(Long itemId) {
-        if (!itemsInMemory.containsKey(itemId))
-            throw new NotFoundException(useType(ITEM));
+        if (!itemsInMemory.containsKey(itemId)) throw new NotFoundException(useType(ITEM));
     }
 }
