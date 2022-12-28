@@ -36,8 +36,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkCreatingItem(Item item) {
-        if(item.getAvailable() == null || item.getName() == null || item.getDescription() == null ||
-        item.getName().isEmpty() || item.getDescription().isEmpty())
+        if (item.getAvailable() == null || item.getName() == null || item.getDescription() == null ||
+                item.getName().isEmpty() || item.getDescription().isEmpty())
             throw new BadRequestException("Неверные поля при создании Item");
     }
 }

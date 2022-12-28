@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     public User createUser(User user) {
-        if(user.getEmail() == null)
+        if (user.getEmail() == null)
             throw new BadRequestException("Графа email пуста");
         return userStorage.createUser(user);
     }
