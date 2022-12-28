@@ -3,9 +3,9 @@ package ru.practicum.shareit.item;
 import java.util.List;
 
 public interface ItemStorage {
-    Item createItem(Item item);
+    Item createItem(Item item, long ownerId);
 
-    Item updateItem(Item item);
+    Item updateItem(Item item, long ownerId);
 
     Item getItemById(Long itemId);
 

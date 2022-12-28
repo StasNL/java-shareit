@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Repository
-public class InMemoryUserStorage implements UserStorage {
+public class UserStorageInMemoryImpl implements UserStorage {
     private long id;
     private static final HashMap<Long, User> users = new HashMap<>();
 
@@ -25,8 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
-        Long userId = user.getId();
+    public User updateUser(User user, long userId) {
         checkUserById(userId);
         User userToUpdate = users.get(userId);
 
@@ -60,8 +59,10 @@ public class InMemoryUserStorage implements UserStorage {
         return List.copyOf(users.values());
     }
 
-    public static void checkUserById(Long userId) {
-        if (!users.containsKey(userId))
+    public static User checkUserById(Long userId) {
+        if (users.containsKey(userId))
+            return users.get(userId);
+        else
             throw new NotFoundException(useType(USER));
     }
 

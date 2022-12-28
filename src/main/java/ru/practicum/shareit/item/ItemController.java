@@ -3,9 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemCreate;
 import ru.practicum.shareit.item.dto.ItemResponse;
-import ru.practicum.shareit.item.dto.ItemUpdate;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -24,19 +22,21 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemResponse createItem(@RequestBody @Valid ItemCreate itemCreate,
+    public ItemResponse createItem(@RequestBody @Valid Item item,
                                    @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
-        Item item = ItemMapper.itemCreateToItem(itemCreate, ownerId);
-        item = itemService.createItem(item);
+        item = itemService.createItem(item, ownerId);
+        item = itemService.getItemById(item.getId());
         return ItemMapper.itemToItemResponse(item);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemResponse updateItem(@RequestBody @Valid ItemUpdate itemUpdate,
+    public ItemResponse updateItem(@RequestBody @Valid Item item,
                                    @RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
                                    @PathVariable Long itemId) {
-        Item item = ItemMapper.itemUpdateToItem(itemUpdate, itemId, ownerId);
-        item = itemService.updateItem(item);
+        if (itemId != null)
+            item.setId(itemId);
+
+        item = itemService.updateItem(item, ownerId);
         item = itemService.getItemById(item.getId());
         return ItemMapper.itemToItemResponse(item);
     }

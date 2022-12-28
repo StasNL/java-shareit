@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.notfound.BadRequestException;
 import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.item.Item;
 
@@ -13,12 +14,13 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
 
-    public Item createItem(Item item) {
-        return itemStorage.createItem(item);
+    public Item createItem(Item item, Long ownerId) {
+        checkCreatingItem(item);
+        return itemStorage.createItem(item, ownerId);
     }
 
-    public Item updateItem(Item item) {
-        return itemStorage.updateItem(item);
+    public Item updateItem(Item item, long ownerId) {
+        return itemStorage.updateItem(item, ownerId);
     }
 
     public Item getItemById(Long itemId) {
@@ -31,5 +33,11 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Item> searchByName(String text) {
         return itemStorage.searchByName(text);
+    }
+
+    private void checkCreatingItem(Item item) {
+        if(item.getAvailable() == null || item.getName() == null || item.getDescription() == null ||
+        item.getName().isEmpty() || item.getDescription().isEmpty())
+            throw new BadRequestException("Неверные поля при создании Item");
     }
 }
