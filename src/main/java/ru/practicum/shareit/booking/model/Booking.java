@@ -5,8 +5,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * TODO Sprint add-bookings.
@@ -30,7 +30,6 @@ public class Booking {
     @OneToOne
     @JoinColumn(name = "booker_id")
     private User booker;
-    @NotNull
     @Column(name = "start_time")
     private LocalDateTime start;
     @Column(name = "end_time")
@@ -39,4 +38,17 @@ public class Booking {
     @Column(name = "status")
     @Builder.Default
     private Status status = Status.WAITING;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Booking booking = (Booking) o;
+        return Objects.equals(id, booking.id) && Objects.equals(item, booking.item) && Objects.equals(booker, booking.booker) && Objects.equals(start, booking.start) && Objects.equals(end, booking.end) && status == booking.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, item, booker, start, end, status);
+    }
 }

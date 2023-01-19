@@ -15,8 +15,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static ru.practicum.shareit.Constants.USER_ID_FROM_HEADER;
-
 /**
  * TODO Sprint add-controllers.
  */
@@ -24,6 +22,7 @@ import static ru.practicum.shareit.Constants.USER_ID_FROM_HEADER;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/items")
 public class ItemController {
+    private final String USER_ID_FROM_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping

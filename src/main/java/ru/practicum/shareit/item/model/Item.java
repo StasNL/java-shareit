@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -14,7 +13,7 @@ import java.util.Objects;
 @Table(name = "items")
 @Getter
 @Setter
-
+@ToString
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,23 +31,17 @@ public class Item {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return id != null && Objects.equals(id, item.id);
+        return Objects.equals(id, item.id)
+                && Objects.equals(name, item.name)
+                && Objects.equals(description, item.description)
+                && Objects.equals(owner, item.owner)
+                && Objects.equals(available, item.available);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "name = " + name + ", " +
-                "description = " + description + ", " +
-                "owner = " + owner + ", " +
-                "available = " + available + ")";
+        return Objects.hash(id, name, description, owner, available);
     }
 }
