@@ -22,30 +22,30 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/items")
 public class ItemController {
-    private final String USER_ID_FROM_HEADER = "X-Sharer-User-Id";
+    private final String identificationHeader = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping
     public ItemResponse createItem(@RequestBody @Valid Item item,
-                                   @RequestHeader(USER_ID_FROM_HEADER) @NotNull Long ownerId) {
+                                   @RequestHeader(identificationHeader) @NotNull Long ownerId) {
         return itemService.createItem(item, ownerId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemResponse updateItem(@RequestBody @Valid Item item,
-                                   @RequestHeader(USER_ID_FROM_HEADER) @NotNull Long ownerId,
+                                   @RequestHeader(identificationHeader) @NotNull Long ownerId,
                                    @PathVariable Long itemId) {
         return itemService.updateItem(item, ownerId, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemResponse getItemById(@RequestHeader(USER_ID_FROM_HEADER) @NotNull Long userId,
+    public ItemResponse getItemById(@RequestHeader(identificationHeader) @NotNull Long userId,
                                     @PathVariable @NotNull Long itemId) {
         return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemResponse> getAllItemsByUserId(@RequestHeader(USER_ID_FROM_HEADER) @NotNull Long ownerId) {
+    public List<ItemResponse> getAllItemsByUserId(@RequestHeader(identificationHeader) @NotNull Long ownerId) {
         return itemService.getAllItemsByUserId(ownerId);
     }
 
@@ -58,7 +58,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentResponse createComment(@RequestBody @Valid Comment comment,
                                          @PathVariable @NotNull Long itemId,
-                                         @RequestHeader(USER_ID_FROM_HEADER) @NotNull Long userId) {
+                                         @RequestHeader(identificationHeader) @NotNull Long userId) {
         return itemService.createComment(comment, itemId, userId);
     }
 }
