@@ -28,6 +28,7 @@ public class UserServiceIntegrationTest extends CreatingModels {
         userService.createUser(userToSave);
 
         User userToUpdate = createDefaultUser();
+        userToUpdate.setId(userToSave.getId());
         userToUpdate.setName("updateName");
 
         userService.updateUser(userToUpdate, userToUpdate.getId());
