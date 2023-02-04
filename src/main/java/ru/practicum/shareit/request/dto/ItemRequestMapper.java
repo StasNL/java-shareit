@@ -30,5 +30,4 @@ public class ItemRequestMapper {
                 .map(ItemRequestMapper::itemRequestToItemRequestResponse)
                 .collect(Collectors.toList());
     }
-
 }

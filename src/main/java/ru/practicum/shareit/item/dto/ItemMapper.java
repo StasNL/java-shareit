@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ItemMapper {
 
-    public static Item itemDtoToItem (ItemDtoForCreate itemDto, ItemRequest itemRequest, User owner) {
+    public static Item itemDtoToItem(ItemDtoForCreate itemDto, ItemRequest itemRequest, User owner) {
         return Item.builder()
                 .description(itemDto.getDescription())
                 .name(itemDto.getName())
@@ -38,6 +38,7 @@ public final class ItemMapper {
                 .requestId(requestId)
                 .build();
     }
+
     public static List<ItemResponse> itemToItemResponse(List<Item> items) {
         return items.stream()
                 .map(ItemMapper::itemToItemResponse)

@@ -26,8 +26,9 @@ public class ItemRequestController {
 
     /**
      * Создание нового запроса на вещь.
+     *
      * @param itemRequest - объект запроса (должен содержать текст)
-     * @param authorId - id автора запроса
+     * @param authorId    - id автора запроса
      * @return - созданный запрос.
      */
 
@@ -39,6 +40,7 @@ public class ItemRequestController {
 
     /**
      * Получение списка своих запросов.
+     *
      * @param authorId - id автора запроса.
      * @return - список своих запросов.
      */
@@ -51,9 +53,10 @@ public class ItemRequestController {
 
     /**
      * Получение списка запросов других пользователей.
+     *
      * @param userId - id пользователя
-     * @param index - индекс первого элемента для пагинации
-     * @param size - количество элементов отображения при пагинации
+     * @param index  - индекс первого элемента для пагинации
+     * @param size   - количество элементов отображения при пагинации
      * @return - список запросов пользователей.
      */
 
@@ -68,13 +71,14 @@ public class ItemRequestController {
 
     /**
      * Получение запроса по id.
+     *
      * @param requestId - id запроса.
      * @return - запрос с указанным id.
      */
 
     @GetMapping("/{requestId}")
     public ItemRequestResponse getRequestById(@RequestHeader(identificationHeader) @NotNull Long userId,
-            @PathVariable Long requestId) {
+                                              @PathVariable Long requestId) {
         return itemRequestService.getRequestById(userId, requestId);
     }
 }

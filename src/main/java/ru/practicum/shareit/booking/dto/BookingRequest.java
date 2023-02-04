@@ -28,13 +28,4 @@ public class BookingRequest {
     private LocalDateTime end;
     @NotNull
     private Long itemId;
-
-    @Override
-    public String toString() {
-        return "BookingRequest{" +
-                "start=" + start +
-                ", end=" + end +
-                ", itemId=" + itemId +
-                '}';
-    }
 }

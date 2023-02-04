@@ -40,7 +40,7 @@ public class CommonService {
                 .orElseThrow(() -> new NotFoundException(useType(REQUEST)));
     }
 
-    protected List<Integer> makePaginationParams (Integer index, Integer size) {
+    protected List<Integer> makePaginationParams(Integer index, Integer size) {
         Integer page = index;
         if (size == null)
             size = Integer.MAX_VALUE;
