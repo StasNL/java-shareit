@@ -3,22 +3,26 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentResponse;
+import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
  */
 @RestController
+@Validated
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/items")
 public class ItemController {
@@ -26,9 +30,9 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemResponse createItem(@RequestBody @Valid Item item,
+    public ItemResponse createItem(@RequestBody @Valid ItemDtoForCreate itemDto,
                                    @RequestHeader(identificationHeader) @NotNull Long ownerId) {
-        return itemService.createItem(item, ownerId);
+        return itemService.createItem(itemDto, ownerId);
     }
 
     @PatchMapping("/{itemId}")
@@ -45,13 +49,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponse> getAllItemsByUserId(@RequestHeader(identificationHeader) @NotNull Long ownerId) {
-        return itemService.getAllItemsByUserId(ownerId);
+    public List<ItemResponse> getAllItemsByUserId(
+            @RequestHeader(identificationHeader) @NotNull Long ownerId,
+            @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer index,
+            @RequestParam(name = "size", required = false) @Positive Integer size
+    ) {
+        return itemService.getAllItemsByUserId(ownerId, index, size);
     }
 
     @GetMapping("/search")
-    public List<ItemResponse> searchByName(@RequestParam(name = "text") @NotNull @NotBlank String text) {
-        return itemService.searchByName(text);
+    public List<ItemResponse> searchByName(
+            @RequestHeader(identificationHeader) @NotNull Long userId,
+            @RequestParam(name = "text") @NotNull String text,
+            @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer index,
+            @RequestParam(name = "size", required = false) @Positive Integer size) {
+        return itemService.searchByName(text, userId, index, size);
     }
 
     @Transactional

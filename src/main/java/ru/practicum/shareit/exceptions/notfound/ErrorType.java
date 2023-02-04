@@ -1,7 +1,7 @@
 package ru.practicum.shareit.exceptions.notfound;
 
 public enum ErrorType {
-    USER, ITEM, OWNER, TEXT, BOOKING;
+    USER, ITEM, OWNER, TEXT, BOOKING, REQUEST;
 
     public static String useType(ErrorType type) {
         String errorMassage;
@@ -20,6 +20,9 @@ public enum ErrorType {
                 break;
             case BOOKING:
                 errorMassage = NotFoundException.errorBookingMessage;
+                break;
+            case REQUEST:
+                errorMassage = NotFoundException.errorRequestMessage;
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
