@@ -84,6 +84,7 @@ public class BookingServiceImpl extends CommonService implements BookingService 
             } else
                 throw new BadRequestException("Бронирование уже было отклонено");
         }
+        booking = bookingRepository.save(booking);
         return BookingMapper.bookingToBookingResponse(booking);
     }
 

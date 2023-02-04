@@ -131,8 +131,9 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
         long userId = 5L;
 
         Comment comment = createDefaultComment();
-        CommentResponse commentResponse = ItemMapper.commentToCommentResponse(comment);
-        List<CommentResponse> commentResponses = List.of(commentResponse);
+        List<Comment> comments = List.of(comment);
+        List<CommentResponse> commentResponses = ItemMapper.commentsToCommentsResponse(comments);
+
 
         when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(item));
@@ -162,8 +163,45 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
     }
 
     @Test
-    void getAllItemsByUserIdTest() {
-        //  Если запрос выполняет владелец вещи, должно произойти обращение к БД за отзывами на неё,
+    void getAllItemsByUserIdOwnerTest() {
+        //  Если запрос выполняет владелец вещи, должно произойти обращение к БД только за комментариями.
+
+        Item item1 = createDefaultItem();
+        item1.setId(2L);
+        Item item2 = createDefaultItem();
+        item2.setId(3L);
+        long userId = 5L;
+
+        Comment comment = createDefaultComment();
+        CommentResponse commentResponse = ItemMapper.commentToCommentResponse(comment);
+        List<CommentResponse> commentResponses = List.of(commentResponse);
+
+        List<Item> items = List.of(item, item1, item2);
+        Page<Item> itemPage = new PageImpl<>(items);
+        when(itemRepository.findAllByOwner_Id(anyLong(), any()))
+                .thenReturn(itemPage);
+        List<ItemResponse> itemResponses = itemService.getAllItemsByUserId(userId, 0, null);
+        ItemResponse itemResponse1 = itemResponses.get(0);
+        itemResponse1.setComments(commentResponses);
+
+        int amountOfRequests = items.size();
+
+        verify(commentRepository, times(amountOfRequests))
+                .findAllByItem_Id(anyLong());
+        verify(bookingRepository, never())
+                .findBookingsByItem_IdAndStatusOrderByStart(anyLong(), any());
+        verify(bookingRepository, never())
+                .findBookingsByItem_IdAndStatusOrderByEndDesc(anyLong(), any());
+
+        ItemResponse itemResponseForTest = ItemMapper.itemToItemResponse(item);
+        itemResponseForTest.setComments(commentResponses);
+
+        assertEquals(itemResponseForTest, itemResponse1);
+    }
+
+    @Test
+    void getAllItemsByUserIdNotOwnerTest() {
+        //  Если запрос выполняет не владелец вещи, должно произойти обращение к БД за отзывами на неё,
         //  а также за датами начала и конца бронирования.
         //  Количество запросов совпадает с количеством предметов у пользователя.
         Item item1 = createDefaultItem();

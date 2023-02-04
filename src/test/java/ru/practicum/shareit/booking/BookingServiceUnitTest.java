@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.utils.PreparingForUnitTest;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingRequest;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.exceptions.notfound.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,23 @@ import static org.mockito.Mockito.*;
 
 public class BookingServiceUnitTest extends PreparingForUnitTest {
 
+    @Test
+    void createNewBookingWrongStartAndEndTest() {
+        // Если происходит попытка бронирования c перепутанными местами временем начала и конца бронирования.
+
+        Booking booking = createDefaultBooking();
+        booking.setStart(LocalDateTime.now().minusDays(1L));
+        booking.setEnd(LocalDateTime.now().minusDays(2L));
+
+        long userId = 2L;
+
+        BookingRequest bookingRequest = BookingMapper.bookingToBookingRequest(booking);
+
+        Throwable exception = assertThrows(BadRequestException.class,
+                () -> bookingService.createNewBooking(bookingRequest, userId));
+
+        assertEquals("Время начала и конца бронирования перепутаны местами.", exception.getMessage());
+    }
     @Test
     void createNewBookingNotAvailableTest() {
         // Если происходит попытка бронирования вещи, бронирование которой не доступно, выбрасывается ошибка.
@@ -75,6 +94,48 @@ public class BookingServiceUnitTest extends PreparingForUnitTest {
     }
 
     @Test
+    void changeBookingStatusApprovedTest() {
+        Booking booking = createDefaultBooking();
+
+        long bookingId = booking.getId();
+        long userId = 1L;
+
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+
+        when(bookingRepository.save(any()))
+                .thenReturn(booking);
+
+        BookingResponse bookingResponse = bookingService.changeBookingStatus(true, bookingId, userId);
+        booking.setStatus(Status.APPROVED);
+
+        BookingResponse bookingResponseForTest = BookingMapper.bookingToBookingResponse(booking);
+
+        assertEquals(bookingResponseForTest, bookingResponse);
+    }
+
+    @Test
+    void changeBookingStatusRejectedTest() {
+        Booking booking = createDefaultBooking();
+
+        long bookingId = booking.getId();
+        long userId = 1L;
+
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+
+        when(bookingRepository.save(any()))
+                .thenReturn(booking);
+
+        BookingResponse bookingResponse = bookingService.changeBookingStatus(false, bookingId, userId);
+        booking.setStatus(Status.REJECTED);
+
+        BookingResponse bookingResponseForTest = BookingMapper.bookingToBookingResponse(booking);
+
+        assertEquals(bookingResponseForTest, bookingResponse);
+    }
+
+    @Test
     void changeBookingStatusNotOwnerTest() {
         // Если статус бронирования пытается сменить не собственник, выбрасывается ошибка.
         Booking booking = createDefaultBooking();
@@ -124,6 +185,21 @@ public class BookingServiceUnitTest extends PreparingForUnitTest {
                 () -> bookingService.changeBookingStatus(false, bookingId, userId));
 
         assertEquals("Бронирование уже было отклонено", exception.getMessage());
+    }
+
+    @Test
+    void getBookingTest() {
+        Booking booking = createDefaultBooking();
+        long bookingId = booking.getId();
+        long userId = booking.getBooker().getId();
+
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(booking));
+
+        BookingResponse bookingResponse = bookingService.getBooking(bookingId, userId);
+        BookingResponse bookingResponseForTest = BookingMapper.bookingToBookingResponse(booking);
+
+        assertEquals(bookingResponseForTest, bookingResponse);
     }
 
     @Test
