@@ -7,8 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
+import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.dto.UserResponse;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utils.CreatingModels;
@@ -31,20 +33,26 @@ public class ItemServiceIntegrationTest extends CreatingModels {
     void getAllItemsByUserIdTest() {
 // Создание пользователя.
         User user = createDefaultUser();
-        userService.createUser(user);
+        user.setId(null);
+        UserResponse userResponse = userService.createUser(user);
 
-        long userId = user.getId();
+        long userId = userResponse.getId();
 // Создание первого предмета.
         Item item1 = createDefaultItem();
+        item1.setId(null);
 
         ItemDtoForCreate itemDto1 = ItemMapper.itemToNewItemDto(item1);
-        itemService.createItem(itemDto1, userId);
+        ItemResponse itemResponse1 = itemService.createItem(itemDto1, userId);
+        long item1Id = itemResponse1.getId();
+        item1.setId(item1Id);
 // Создание второго предмета.
         Item item2 = createDefaultItem();
-        item2.setId(2L);
+        item2.setId(null);
 
         ItemDtoForCreate itemDto2 = ItemMapper.itemToNewItemDto(item2);
-        itemService.createItem(itemDto2, userId);
+        ItemResponse itemResponse2 = itemService.createItem(itemDto2, userId);
+        long item2Id = itemResponse2.getId();
+        item2.setId(item2Id);
 // Запрос в БД.
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.owner.id = ?1", Item.class);
         query.setParameter(1, userId);

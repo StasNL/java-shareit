@@ -25,20 +25,19 @@ public class UserServiceIntegrationTest extends CreatingModels {
     @Test
     void updateUserTest() {
         User userToSave = createDefaultUser();
-
-        UserResponse userResponse = userService.createUser(userToSave);
-
-        long userId = userResponse.getId();
+        userToSave.setId(null);
+        UserResponse userResponse1 = userService.createUser(userToSave);
+        long userToSaveId = userResponse1.getId();
+        userToSave.setId(userToSaveId);
 
         User userToUpdate = createDefaultUser();
-        userToUpdate.setId(userId);
+        userToUpdate.setId(userToSaveId);
         userToUpdate.setName("updateName");
-
         userService.updateUser(userToUpdate, userToUpdate.getId());
 
         TypedQuery<User> query = em.createQuery("SELECT u from User u where u.id = ?1", User.class);
 
-        User user = query.setParameter(1, userId)
+        User user = query.setParameter(1, userToSaveId)
                 .getSingleResult();
 
         assertEquals(user.getId(), userToUpdate.getId());
