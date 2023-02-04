@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.BOOKING;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.useType;
 
 public class BookingServiceUnitTest extends PreparingForUnitTest {
 
@@ -42,6 +44,7 @@ public class BookingServiceUnitTest extends PreparingForUnitTest {
 
         assertEquals("Время начала и конца бронирования перепутаны местами.", exception.getMessage());
     }
+
     @Test
     void createNewBookingNotAvailableTest() {
         // Если происходит попытка бронирования вещи, бронирование которой не доступно, выбрасывается ошибка.
@@ -200,6 +203,20 @@ public class BookingServiceUnitTest extends PreparingForUnitTest {
         BookingResponse bookingResponseForTest = BookingMapper.bookingToBookingResponse(booking);
 
         assertEquals(bookingResponseForTest, bookingResponse);
+    }
+
+    @Test
+    void getWrongBookingTest() {
+//     При запросе несуществующего бронироания выбросится ошибка.
+        Booking booking = createDefaultBooking();
+        long bookingId = booking.getId();
+        long userId = booking.getBooker().getId();
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> bookingService.getBooking(bookingId, userId));
+
+        String errorMessage = useType(BOOKING);
+        assertEquals(errorMessage, exception.getMessage());
     }
 
     @Test

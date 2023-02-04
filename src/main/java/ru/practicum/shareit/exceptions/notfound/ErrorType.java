@@ -15,9 +15,6 @@ public enum ErrorType {
             case OWNER:
                 errorMassage = NotFoundException.errorOwnerMessage;
                 break;
-            case TEXT:
-                errorMassage = NotFoundException.errorTextMessage;
-                break;
             case BOOKING:
                 errorMassage = NotFoundException.errorBookingMessage;
                 break;

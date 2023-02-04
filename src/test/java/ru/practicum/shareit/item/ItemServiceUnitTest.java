@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.ITEM;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.useType;
 
 
 public class ItemServiceUnitTest extends PreparingForUnitTest {
@@ -99,6 +101,20 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
                 () -> itemService.updateItem(item, userId, itemId));
 
         assertEquals("Вещь с указанным id у данного собственника не найдена.", exception.getMessage());
+    }
+
+    @Test
+    void getItemByWrongId() {
+//       Если предмета не в базе, выбросит ошибку.
+        User user = createDefaultUser();
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemService.getItemById(item.getId(), user.getId()));
+
+        String errorMessage = useType(ITEM);
+        assertEquals(errorMessage, exception.getMessage());
     }
 
     @Test

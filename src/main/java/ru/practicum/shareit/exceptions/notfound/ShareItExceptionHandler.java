@@ -44,8 +44,8 @@ public class ShareItExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleBadStatusException(final BadStatusException e) {
+    public ErrorMessage handleBadStatusException(final BadStatusException e) {
         log.info("Response status code 400 Bad request {}", e.getMessage());
-        return Map.of("Wrong status", e.getMessage());
+        return new ErrorMessage(e.getMessage());
     }
 }
