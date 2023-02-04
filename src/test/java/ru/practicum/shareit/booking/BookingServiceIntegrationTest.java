@@ -54,6 +54,7 @@ public class BookingServiceIntegrationTest extends CreatingModels {
 //     Создание вещи.
         Item item = createDefaultItem();
         item.setId(null);
+        item.setOwner(owner);
         ItemDtoForCreate itemDto = ItemMapper.itemToNewItemDto(item);
         ItemResponse itemResponse = itemService.createItem(itemDto, ownerId);
         long itemId = itemResponse.getId();
