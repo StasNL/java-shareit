@@ -77,6 +77,8 @@ public class ItemServiceImpl extends CommonService implements ItemService {
         if (item.getAvailable() != null)
             updatedItem.setAvailable(item.getAvailable());
 
+        updatedItem = itemRepository.save(updatedItem);
+
         log.info("item c id = " + itemId + " успешно отредактирован.");
         return ItemMapper.itemToItemResponse(updatedItem);
     }

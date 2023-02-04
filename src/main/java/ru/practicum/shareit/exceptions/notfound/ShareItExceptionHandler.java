@@ -36,13 +36,6 @@ public class ShareItExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleDuplicateException(final DuplicateException e) {
-        log.info("Response status code 409 Conflict {}", e.getMessage());
-        return Map.of("Object is already exist", e.getMessage());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleBadRequestException(final BadRequestException e) {
         log.info("Response status code 400 Bad request {}", e.getMessage());
@@ -51,8 +44,8 @@ public class ShareItExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleBadStatusException(final BadStatusException e) {
+    public Map<String, String> handleBadStatusException(final BadStatusException e) {
         log.info("Response status code 400 Bad request {}", e.getMessage());
-        return new ErrorMessage(e.getMessage());
+        return Map.of("Wrong status", e.getMessage());
     }
 }

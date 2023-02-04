@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.repositories.CommentRepository;
 import ru.practicum.shareit.item.repositories.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -32,4 +33,6 @@ public class PreparingForUnitTest extends CreatingModels {
     protected ItemServiceImpl itemService;
     @InjectMocks
     protected BookingServiceImpl bookingService;
+    @InjectMocks
+    protected ItemRequestServiceImpl requestService;
 }

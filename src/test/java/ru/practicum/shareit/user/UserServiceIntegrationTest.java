@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.notfound.BadRequestException;
+import ru.practicum.shareit.exceptions.notfound.NotFoundException;
 import ru.practicum.shareit.user.dto.UserResponse;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -14,6 +16,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.*;
+import static ru.practicum.shareit.exceptions.notfound.ErrorType.USER;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -43,5 +48,26 @@ public class UserServiceIntegrationTest extends CreatingModels {
         assertEquals(user.getId(), userToUpdate.getId());
         assertEquals(user.getName(), userToUpdate.getName());
         assertEquals(user.getEmail(), userToUpdate.getEmail());
+    }
+
+    @Test
+    void updateWrongUserTest() {
+//     Если сделать попытку обновить пользователя, которого не существует, выбросит ошибку.
+        User userToUpdate = createDefaultUser();
+        userToUpdate.setName("updateName");
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> userService.updateUser(userToUpdate, userToUpdate.getId()));
+        String errorMessage = useType(USER);
+        assertEquals(errorMessage, exception.getMessage());
+    }
+
+    @Test
+    void createUserWithoutEmailTest() {
+        User user = createDefaultUser();
+        // При передаче пользователя без почты выбрасывается исключение.
+        user.setEmail(null);
+        Throwable exception = assertThrows(BadRequestException.class, () -> userService.createUser(user));
+        assertEquals("Графа email пуста", exception.getMessage());
     }
 }

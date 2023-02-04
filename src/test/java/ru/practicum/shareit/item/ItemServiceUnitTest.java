@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import ru.practicum.shareit.item.dto.CommentResponse;
 import ru.practicum.shareit.utils.PreparingForUnitTest;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.notfound.BadRequestException;
@@ -66,6 +68,26 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
 
     @Test
     void updateItemTest() {
+        Long ownerId = item.getOwner().getId();
+        ItemRequest itemRequest = createDefaultItemRequest();
+
+        item.setRequest(itemRequest);
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
+        when(itemRepository.save(any()))
+                .thenReturn(item);
+
+        ItemResponse itemResponse = itemService.updateItem(item, ownerId, item.getId());
+        Item itemForTest = item;
+        itemForTest.setId(itemResponse.getId());
+
+        assertEquals(item, itemForTest);
+    }
+
+    @Test
+    void updateItemExceptionTest() {
         //Если пользователь не является владельцем, должна выпасть ошибка NotFoundException.
         long userId = 2L;
         long itemId = item.getId();
@@ -80,9 +102,9 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
     }
 
     @Test
-    void getItemByIdTest() {
+    void getItemByIdForOwnerTest() {
         // Если запрос выполняет владелец вещи, должно произойти обращение к БД за отзывами на неё,
-        // а также за датами начала и конца бронинования.
+        // а также за датами начала и конца бронирования.
         long itemId = item.getId();
         long userId = item.getOwner().getId();
 
@@ -100,9 +122,49 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
     }
 
     @Test
+    void getItemByIdForNotOwnerTest() {
+        // Если запрос выполняет не владелец вещи, должно произойти обращение к БД только за комментариями.
+
+        User owner = item.getOwner();
+        ItemRequest request = item.getRequest();
+        long itemId = item.getId();
+        long userId = 5L;
+
+        Comment comment = createDefaultComment();
+        CommentResponse commentResponse = ItemMapper.commentToCommentResponse(comment);
+        List<CommentResponse> commentResponses = List.of(commentResponse);
+
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(item));
+
+        ItemResponse itemResponse = itemService.getItemById(itemId, userId);
+        itemResponse.setComments(commentResponses);
+
+        Item itemForTest = Item.builder()
+                .id(itemResponse.getId())
+                .name(itemResponse.getName())
+                .owner(owner)
+                .available(itemResponse.getAvailable())
+                .description(itemResponse.getDescription())
+                .request(request)
+                .build();
+
+        verify(commentRepository, times(1))
+                .findAllByItem_Id(itemId);
+        verify(bookingRepository, never())
+                .findBookingsByItem_IdAndStatusOrderByStart(anyLong(), any());
+        verify(bookingRepository, never())
+                .findBookingsByItem_IdAndStatusOrderByEndDesc(anyLong(), any());
+
+        ItemResponse itemResponseForTest = ItemMapper.itemToItemResponseWithComments(item, commentResponses);
+        assertEquals(itemResponseForTest, itemResponse);
+        assertEquals(item, itemForTest);
+    }
+
+    @Test
     void getAllItemsByUserIdTest() {
         //  Если запрос выполняет владелец вещи, должно произойти обращение к БД за отзывами на неё,
-        //  а также за датами начала и конца бронинования.
+        //  а также за датами начала и конца бронирования.
         //  Количество запросов совпадает с количеством предметов у пользователя.
         Item item1 = createDefaultItem();
         item1.setId(2L);
@@ -128,6 +190,29 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
 
     @Test
     void searchByNameTest() {
+        User owner = item.getOwner();
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(owner));
+
+        PageRequest request = PageRequest.of(0, Integer.MAX_VALUE);
+        String text = "Вещь";
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+        Page<Item> itemPage = new PageImpl<>(items, request, Integer.MAX_VALUE);
+
+        when(itemRepository.findAllByPartOfName(text, request))
+                .thenReturn(itemPage);
+
+        List<ItemResponse> itemResponses = itemService.searchByName(text, owner.getId(), 0, Integer.MAX_VALUE);
+        ItemResponse itemResponse = ItemMapper.itemToItemResponse(item);
+
+        assertEquals(1, itemResponses.size());
+        assertEquals(itemResponse, itemResponses.get(0));
+    }
+
+    @Test
+    void searchByNameExceptionTest() {
         // Если передать в метод пустой текст, вернётся пустой список предметов.
         List<ItemResponse> items = itemService.searchByName("", 1L, 0, null);
 
@@ -136,6 +221,35 @@ public class ItemServiceUnitTest extends PreparingForUnitTest {
 
     @Test
     void createCommentTest() {
+        Comment comment = createDefaultComment();
+        long itemId = comment.getItem().getId();
+        long userId = 2L;
+
+        List<Booking> bookings = new ArrayList<>();
+        Booking booking = createDefaultBooking();
+        bookings.add(booking);
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+        when(bookingRepository.findBookingsByBooker_IdAndStartBefore(anyLong(), any()))
+                .thenReturn(bookings);
+        when(commentRepository.save(any()))
+                .thenReturn(comment);
+
+        CommentResponse commentResponse = itemService.createComment(comment, itemId, userId);
+        Comment commentForTest = Comment.builder()
+                .id(commentResponse.getId())
+                .item(item)
+                .text(commentResponse.getText())
+                .created(commentResponse.getCreated())
+                .authorName(commentResponse.getAuthorName())
+                .build();
+
+        assertEquals(commentForTest, comment);
+    }
+
+    @Test
+    void createCommentExceptionTest() {
         // Если пользователь не пользовался предметом (то есть в базе не найдётся запросов для данного пользователя
         // со временем начала бронирования до настоящего времени), выскакивает ошибка.
         Comment comment = createDefaultComment();

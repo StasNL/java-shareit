@@ -46,12 +46,14 @@ public class ItemRequestServiceIntegrationTest extends CreatingModels {
 //     Создание запроса вещей.
         ItemRequest itemRequest1 = createDefaultItemRequest();
         itemRequest1.setId(null);
+        itemRequest1.setAuthor(author);
         ItemRequestResponse requestResponse1 = requestService.createRequest(itemRequest1, author.getId());
         long itemRequest1Id = requestResponse1.getId();
         itemRequest1.setId(itemRequest1Id);
 
         ItemRequest itemRequest2 = createDefaultItemRequest();
         itemRequest2.setId(null);
+        itemRequest2.setAuthor(author);
         ItemRequestResponse requestResponse2 = requestService.createRequest(itemRequest2, author.getId());
         long itemRequest2Id = requestResponse2.getId();
         itemRequest2.setId(itemRequest2Id);

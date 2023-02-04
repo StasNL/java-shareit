@@ -43,25 +43,24 @@ public class ItemServiceIntegrationTest extends CreatingModels {
 
         ItemDtoForCreate itemDto1 = ItemMapper.itemToNewItemDto(item1);
         ItemResponse itemResponse1 = itemService.createItem(itemDto1, userId);
-        long item1Id = itemResponse1.getId();
-        item1.setId(item1Id);
+
 // Создание второго предмета.
         Item item2 = createDefaultItem();
         item2.setId(null);
 
         ItemDtoForCreate itemDto2 = ItemMapper.itemToNewItemDto(item2);
         ItemResponse itemResponse2 = itemService.createItem(itemDto2, userId);
-        long item2Id = itemResponse2.getId();
-        item2.setId(item2Id);
+
 // Запрос в БД.
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.owner.id = ?1", Item.class);
         query.setParameter(1, userId);
 // Проверка.
         List<Item> items = query.getResultList();
-        Item item1FromDb = items.get(0);
-        Item item2FromDb = items.get(1);
+        List<ItemResponse> itemResponses = ItemMapper.itemToItemResponse(items);
+        ItemResponse item1FromDb = itemResponses.get(0);
+        ItemResponse item2FromDb = itemResponses.get(1);
 
-        assertEquals(item1, item1FromDb);
-        assertEquals(item2, item2FromDb);
+        assertEquals(itemResponse1, item1FromDb);
+        assertEquals(itemResponse2, item2FromDb);
     }
 }

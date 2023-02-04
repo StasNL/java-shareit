@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingRequest;
 import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.notfound.BadStatusException;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 import ru.practicum.shareit.item.dto.ItemResponse;
@@ -24,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -78,5 +80,24 @@ public class BookingServiceIntegrationTest extends CreatingModels {
         Booking bookingFromDb = query.getSingleResult();
 
         assertEquals(booking, bookingFromDb);
+    }
+
+    @Test
+    void getBookingsByBookerBadStatusTest() {
+//      При передаче статуса, не входящего в список допустимых, выбрасывает ошибку.
+        //     Создание владельца вещи.
+        User owner = createDefaultUser();
+        owner.setId(null);
+        UserResponse userResponse1 = userService.createUser(owner);
+        long ownerId = userResponse1.getId();
+        owner.setId(ownerId);
+
+        String state = "Неверный статус";
+
+        Throwable exception = assertThrows(BadStatusException.class,
+                () -> bookingService.getBookingsByBooker(state, ownerId, 0, Integer.MAX_VALUE));
+
+        String errorMessage = "Unknown state: " + state;
+        assertEquals(errorMessage, exception.getMessage());
     }
 }
