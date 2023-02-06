@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
-    private final String identificationHeader = "X-Sharer-User-Id";
+    private static final String IDENTIFICATION_HEADER = "X-Sharer-User-Id";
     private final ItemRequestService itemRequestService;
 
     /**
@@ -34,7 +34,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestResponse createRequest(@RequestBody @Valid ItemRequest itemRequest,
-                                             @RequestHeader(identificationHeader) @NotNull Long authorId) {
+                                             @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long authorId) {
         return itemRequestService.createRequest(itemRequest, authorId);
     }
 
@@ -47,7 +47,7 @@ public class ItemRequestController {
 
     @GetMapping
     public List<ItemRequestResponse> getAllRequestsByAuthorId(
-            @RequestHeader(identificationHeader) @NotNull Long authorId) {
+            @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long authorId) {
         return itemRequestService.getAllRequestsByAuthorId(authorId);
     }
 
@@ -62,7 +62,7 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestResponse> getAllRequests(
-            @RequestHeader(identificationHeader) @NotNull Long userId,
+            @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long userId,
             @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer index,
             @RequestParam(name = "size", required = false) @Positive Integer size
     ) {
@@ -77,7 +77,7 @@ public class ItemRequestController {
      */
 
     @GetMapping("/{requestId}")
-    public ItemRequestResponse getRequestById(@RequestHeader(identificationHeader) @NotNull Long userId,
+    public ItemRequestResponse getRequestById(@RequestHeader(IDENTIFICATION_HEADER) @NotNull Long userId,
                                               @PathVariable Long requestId) {
         return itemRequestService.getRequestById(userId, requestId);
     }

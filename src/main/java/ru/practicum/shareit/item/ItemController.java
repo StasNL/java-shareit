@@ -26,31 +26,31 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/items")
 public class ItemController {
-    private final String identificationHeader = "X-Sharer-User-Id";
+    private static final String IDENTIFICATION_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping
     public ItemResponse createItem(@RequestBody @Valid ItemDtoForCreate itemDto,
-                                   @RequestHeader(identificationHeader) @NotNull Long ownerId) {
+                                   @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long ownerId) {
         return itemService.createItem(itemDto, ownerId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemResponse updateItem(@RequestBody @Valid Item item,
-                                   @RequestHeader(identificationHeader) @NotNull Long ownerId,
+                                   @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long ownerId,
                                    @PathVariable Long itemId) {
         return itemService.updateItem(item, ownerId, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemResponse getItemById(@RequestHeader(identificationHeader) @NotNull Long userId,
+    public ItemResponse getItemById(@RequestHeader(IDENTIFICATION_HEADER) @NotNull Long userId,
                                     @PathVariable @NotNull Long itemId) {
         return itemService.getItemById(itemId, userId);
     }
 
     @GetMapping
     public List<ItemResponse> getAllItemsByUserId(
-            @RequestHeader(identificationHeader) @NotNull Long ownerId,
+            @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long ownerId,
             @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer index,
             @RequestParam(name = "size", required = false) @Positive Integer size
     ) {
@@ -59,7 +59,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemResponse> searchByName(
-            @RequestHeader(identificationHeader) @NotNull Long userId,
+            @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long userId,
             @RequestParam(name = "text") @NotNull String text,
             @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer index,
             @RequestParam(name = "size", required = false) @Positive Integer size) {
@@ -70,7 +70,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentResponse createComment(@RequestBody @Valid Comment comment,
                                          @PathVariable @NotNull Long itemId,
-                                         @RequestHeader(identificationHeader) @NotNull Long userId) {
+                                         @RequestHeader(IDENTIFICATION_HEADER) @NotNull Long userId) {
         return itemService.createComment(comment, itemId, userId);
     }
 }
