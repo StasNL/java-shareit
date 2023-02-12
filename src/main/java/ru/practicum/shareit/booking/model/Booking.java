@@ -16,7 +16,6 @@ import java.util.Objects;
 @Table(name = "bookings")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

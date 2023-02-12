@@ -9,6 +9,9 @@ import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.dto.UserResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BookingMapper {
     public static Booking mapToBooking(BookingRequest bookingDto) {
@@ -30,6 +33,21 @@ public final class BookingMapper {
                 .status(booking.getStatus())
                 .item(itemResponse)
                 .booker(booker)
+                .build();
+    }
+
+    public static List<BookingResponse> bookingToBookingResponse(List<Booking> bookings) {
+        return bookings.stream()
+                .map(BookingMapper::bookingToBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    public static BookingRequest bookingToBookingRequest(Booking booking) {
+        long itemId = booking.getItem().getId();
+        return BookingRequest.builder()
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .itemId(itemId)
                 .build();
     }
 }

@@ -15,6 +15,7 @@ public class ItemResponse {
     private Boolean available;
     private ItemResponse.Booking lastBooking;
     private ItemResponse.Booking nextBooking;
+    private Long requestId;
     private List<CommentResponse> comments;
 
     @Data
