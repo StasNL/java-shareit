@@ -10,7 +10,7 @@ services:
       - server
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
-      - TZ=Europe/Moscow
+      - TZ=Europe/London
       - DEBIAN_FRONTEND=noninteractive
 
   server:
@@ -23,7 +23,7 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:6541/shareit
-      - TZ=Europe/Moscow
+      - TZ=Europe/London
       - DEBIAN_FRONTEND=noninteractive
 
   db:
